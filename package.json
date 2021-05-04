@@ -1,0 +1,16 @@
+{
+  "name": "webscrappers",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "scrapper": "node ./src/index.js"
+  },
+  "author": "Carlos Carvajal and Erick Garcia",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "selenium-webdriver": "*"
+  }
+}
