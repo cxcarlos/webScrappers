@@ -24,7 +24,7 @@ const getIntoBdP = async () => {
         await driver.findElement(By.id("username")).sendkeys(`${process.env.BDP_USER}\n`).then(async () => {
             await driver.findElement(By.id("password")).sendKeys(`${process.env.BDP_USER_PASSWORD}\n`).then(async () => { 
                 await driver.findElement(By.name("_eventId_aceptar")).click().then(async () => {
-                    await driver.findElement(By.className.("contenedor-formulario").then(async () => {
+                    await driver.findElement(By.className("contenedor-formulario")).then(async () => {
                         await driver.findElement(By.name("separador-inferior-blanco")).then(async () => {
                             console.log("Me") 
                         })
