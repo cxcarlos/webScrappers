@@ -5,7 +5,7 @@ const moment = require("moment");
 const {Builder, By, Key, until} = require('selenium-webdriver'); 
 const { get } = require('selenium-webdriver/http');
 
-let data =  [];
+let data = [];
 
 const GetDateFormat = (date) => { 
     var month = (date.getMonth() + 1).toString();
@@ -48,37 +48,29 @@ const getIntoBdP = async () => {
                                     driver.executeScript(`arguments[0].value='${maxDate("2021-04-30")}';`, fechaHasta);
                                     await driver.findElement(By.name("_eventId_consultar")).click().then(async () => { 
                                        await driver.wait(until.elementLocated(By.id("table_1")),5000).findElements(By.css("tr")).then(async (rowList) =>{
-                                           async function testAsync(rowList){
-                                               return new Promise((resolve,reject)=>{
-                                                   for(var i=1 ; i < rowList.length; i++){
-                                                       rowList[i].findElements(By.css("td")).then(async (colValue) => {
-                                                           colValue[0].getText().then((coltxt) => {
-                                                               colValue[4].getText().then((coltxt2) => {
-                                                                   const newData = {
-                                                                       fecha: coltxt,
-                                                                       numero: coltxt2
-                                                                    }
-                                                                    data = [... data, newData]
-                                                                    
-                                                                    if(i===rowList.length)
-                                                                    {
-                                                                        console.log(rowList.length);
-                                                                    }
-                                                                })
+                                           const recolectData = async (rowList) => {                                             
+                                                for(var i=1 ; i < rowList.length; i++){
+                                                    await rowList[i].findElements(By.css("td")).then(async (colValue) => {
+                                                        await colValue[0].getText().then(async (coltxt) => {
+                                                            await colValue[4].getText().then( async (coltxt2) => {
+                                                                const newData = {
+                                                                    fecha: coltxt,
+                                                                    numero: coltxt2
+                                                                }
+                                                                data = [... data, newData]                                                                    
                                                             })
-                                                        })                                                          
-                                                    } 
-                                                    resolve();
-                                                });
+                                                        })
+                                                    })                                                          
+                                                }     
                                             }
-                                            async function doing (rowList){
-                                                await testAsync(rowList)
+                                            const jsonData = async(rowList) => {
+                                                await recolectData(rowList);
                                                 fs.writeFile('data.json', JSON.stringify(data),'utf8', (err) => { 
                                                     if (err) throw err; 
                                                     console.log('The file has been saved!'); 
                                                 }); 
                                             }
-                                            doing(rowList);  
+                                            jsonData(rowList);  
                                         })
                                     })                                    
                                     
