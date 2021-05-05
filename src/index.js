@@ -1,22 +1,11 @@
 require('dotenv').config(); 
+const { rejects } = require('assert');
 const fs = require('fs'); 
 const moment = require("moment");
 const {Builder, By, Key, until} = require('selenium-webdriver'); 
+const { get } = require('selenium-webdriver/http');
 
-// const myFn = async () 
-// let driver = await new Builder().forBrowser('chrome).build(); 
-// await driver.get(lihttps://www.google.com"); 
-// await driver.findElement(By.name('W)).sendkeys("Seleniumn,Key.RETURN) 
-// 1 9 10 11 // myFn(); 12 13 
 let data =  [];
-
-/*let notes = [
-  {
-    id: 1,
-    content: "HTML is easy, very easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true,
-  }*/
 
 const GetDateFormat = (date) => { 
     var month = (date.getMonth() + 1).toString();
@@ -58,30 +47,40 @@ const getIntoBdP = async () => {
                                     driver.executeScript(`arguments[0].value='${minDate("2021-04-30")}';`, fechaDesde);
                                     driver.executeScript(`arguments[0].value='${maxDate("2021-04-30")}';`, fechaHasta);
                                     await driver.findElement(By.name("_eventId_consultar")).click().then(async () => { 
-                                       // List<WebElement> rowsList;
-                                       let valoresCol= [];
-                                        let rowList = await driver.wait(until.elementLocated(By.id("table_1")),5000).findElements(By.css("tr")).then(async (rowList) =>{
-                                            for(var i=1 ; i< rowList.length; i++){
-                                                await rowList[i].findElements(By.css("td")).then(async (colValue) => {
-                                                        colValue[0].getText().then((coltxt) => {
-                                                            colValue[4].getText().then((coltxt2) => {
-                                                                const newData = {
-                                                                    fecha: coltxt,
-                                                                    numero: coltxt2
-                                                                }
-                                                                data = [... data, newData] //o notes.concat(newNote)
-                                                                console.log(newData)
+                                       await driver.wait(until.elementLocated(By.id("table_1")),5000).findElements(By.css("tr")).then(async (rowList) =>{
+                                           async function testAsync(rowList){
+                                               return new Promise((resolve,reject)=>{
+                                                   for(var i=1 ; i < rowList.length; i++){
+                                                       rowList[i].findElements(By.css("td")).then(async (colValue) => {
+                                                           colValue[0].getText().then((coltxt) => {
+                                                               colValue[4].getText().then((coltxt2) => {
+                                                                   const newData = {
+                                                                       fecha: coltxt,
+                                                                       numero: coltxt2
+                                                                    }
+                                                                    data = [... data, newData]
+                                                                    
+                                                                    if(i===rowList.length)
+                                                                    {
+                                                                        console.log(rowList.length);
+                                                                    }
+                                                                })
                                                             })
-                                                        })
-                                                })  
+                                                        })                                                          
+                                                    } 
+                                                    resolve();
+                                                });
                                             }
+                                            async function doing (rowList){
+                                                await testAsync(rowList)
+                                                fs.writeFile('data.json', JSON.stringify(data),'utf8', (err) => { 
+                                                    if (err) throw err; 
+                                                    console.log('The file has been saved!'); 
+                                                }); 
+                                            }
+                                            doing(rowList);  
                                         })
-                                        fs.writeFile('data.json', JSON.stringify(data),'utf8', (err) => { 
-                                            if (err) throw err; 
-                                            console.log('The file has been saved!'); 
-                                          }); 
-                                        
-                                    })
+                                    })                                    
                                     
                                 })
                             })
@@ -93,5 +92,21 @@ const getIntoBdP = async () => {
     })
 };
 
+const getIntoBdP2 = async () => {
+    await driver.findElement(By.id("centrecontent")).then(async () => {
+        let fechaDesde = await driver.wait(until.elementLocated(By.id("fechaDesde")));
+        let fechaHasta = await driver.wait(until.elementLocated(By.id("fechaHasta")));
+        driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaDesde);
+        driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaHasta);
+        driver.executeScript(`arguments[0].value='${minDate("2021-04-25")}';`, fechaDesde);
+        driver.executeScript(`arguments[0].value='${maxDate("2021-04-25")}';`, fechaHasta);
+    })
+}
 
-getIntoBdP();
+const main = async () => {
+    await getIntoBdP();
+    await getIntoBdP2();
+}
+
+
+main();
