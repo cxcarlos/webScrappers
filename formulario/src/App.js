@@ -54,9 +54,11 @@ function App() {
   return (
     <Fragment>
       <br/>
-      Referencia: <input ref={todoTaskRef} type='text' placeholder="# Referencia"/>
+        Referencia: <input ref={todoTaskRef} type='text' placeholder="# Referencia"/>
       <br/>
          Lote: <input ref={todoLoteRef} type='text' placeholder="# Lote"/>
+      <br/>
+        <input type="date" id="start" name="date" value="2018-07-22" min="2000-01-01" max="2030-12-31" required/>
       <br/>
       <button type='submit' onClick={handleTodoAdd} >Agregar</button>
       <button type='submit'onClick={handlerClearAll}>Eliminar</button>
