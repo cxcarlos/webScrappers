@@ -43,4 +43,6 @@ const getIntoBdP = async () => {
     })
 };
 
+
 getIntoBdP();
+driver.quit();
