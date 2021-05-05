@@ -3,11 +3,11 @@ import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 import { withStyles} from "@material-ui/core/styles";
 
-export default function TodoItem({ todo, toggleTodo }) {
-  const { id, reference, lote, completed } = todo;
+export default function PaymentItem({ payment, togglePayment }) {
+  const { date, reference, lote} = payment;
 
-  const handleTodoClick = () => {
-    toggleTodo(id);
+  const handlePaymentClick = () => {
+    togglePayment(reference);
   };
 
   const StyledTableCell = withStyles((theme) => ({
@@ -32,10 +32,9 @@ export default function TodoItem({ todo, toggleTodo }) {
   }))(TableRow);
 
   return (
-    <StyledTableRow key={id}>
-      <StyledTableCell component="th" scope="row" align="center">
-        {reference}
-      </StyledTableCell>
+    <StyledTableRow key={reference}>
+      <StyledTableCell align="center">{date}</StyledTableCell>
+      <StyledTableCell component="th" scope="row" align="center">{reference}</StyledTableCell>
       <StyledTableCell align="center">{lote}</StyledTableCell>
       <StyledTableCell align="center"> </StyledTableCell>
     </StyledTableRow>

@@ -1,69 +1,71 @@
 import React, {Fragment, useState, useRef, useEffect} from "react";
-import {v4 as uuidv4} from 'uuid';
-import TodoList from './components/TodoList';
+//import {v4 as uulotev4} from 'uulote';
+import PaymentList from "./components/PaymentList";
 //import logo from './logo.svg';
 import './App.css';
 
-const KEY = 'todoApp.todos';
+const KEY = 'payApp.payments';
 
 function App() {
 
-  const [todos, setTodos] = useState([
-    { id: 1, reference: '00035189', lote: '54945', completed: false},
+  const [payments, setPayments] = useState([
+    { date: "2020-05-13", reference: '00035189', lote: '54945'},
   ])
   
-  const todoTaskRef = useRef();
-  const todoLoteRef = useRef();
+  const paymentRef = useRef();
+  const paymentLoteRef = useRef();
+  const paymentDateRef = useRef();
 
   useEffect(() => {
-    const storedTodos = JSON.parse(localStorage.getItem(KEY));
-    if(storedTodos){
-      setTodos(storedTodos);
+    const storedpayments = JSON.parse(localStorage.getItem(KEY));
+    if(storedpayments){
+      setPayments(storedpayments);
     }
 
   }, [])
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(todos))
-  }, [todos]);
+    localStorage.setItem(KEY, JSON.stringify(payments))
+  }, [payments]);
 
-  const toggleTodo = (id) => {
-    const newTodos = [...todos];
-    const todo = newTodos.find((todo) => todo.id === id);
-    todo.completed = !(todo.completed);
-    setTodos(newTodos); // lo volvoemos a enviar con el estado cambiado
+  const togglePayment = (lote) => {
+    const newpayments = [...payments];
+    const payment = newpayments.find((payment) => payment.lote === lote);
+    payment.completed = !(payment.completed);
+    setPayments(newpayments); // lo volvoemos a enviar con el estado cambiado
   }
 
-  const handleTodoAdd = () => {
-    const reference = todoTaskRef.current.value;
-    const lote = todoLoteRef.current.value;
+  const handlePaymentAdd = () => {
+    const reference = paymentRef.current.value;
+    const lote = paymentLoteRef.current.value;
     if(reference ==="" && lote === "")return;
-    setTodos((prevTodos) => {
-      return [...prevTodos, {id: uuidv4(), reference, lote, completed: false}]
+    setPayments((prevpayments) => {
+      return [...prevpayments, {date: paymentDateRef.current.value, reference, lote}]
     })
 
-    todoTaskRef.current.value = null ;
-    todoLoteRef.current.value = null ;
+    paymentRef.current.value = null ;
+    paymentLoteRef.current.value = null ;
   }
 
   const handlerClearAll = () => {
-    const newTodos = todos.filter(todo => !todo.completed)
-    setTodos(newTodos);
+    const newpayments = payments.filter(payment => !payment.completed)
+    setPayments(newpayments);
   }
 
   return (
     <Fragment>
       <br/>
-        Referencia: <input ref={todoTaskRef} type='text' placeholder="# Referencia"/>
+        Referencia: <input ref={paymentRef} type='text' placeholder="# Referencia"/>
       <br/>
-         Lote: <input ref={todoLoteRef} type='text' placeholder="# Lote"/>
+         Lote: <input ref={paymentLoteRef} type='text' placeholder="# Lote"/>
       <br/>
-        <input type="date" id="start" name="date" value="2018-07-22" min="2000-01-01" max="2030-12-31" required/>
+        Fecha: <input type="date" ref={paymentDateRef} name="date" min="2000-01-01" max="2030-12-31" required/>
       <br/>
-      <button type='submit' onClick={handleTodoAdd} >Agregar</button>
+      <button type='submit' onClick={handlePaymentAdd} >Agregar</button>
       <button type='submit'onClick={handlerClearAll}>Eliminar</button>
       <br/><br/><br/>
-      <TodoList todos={todos} toggleTodo={toggleTodo}/>
+
+      <PaymentList payments={payments} togglePayment={togglePayment}/>
       
     </Fragment>
   );
