@@ -1,4 +1,5 @@
 require('dotenv').config(); 
+const fs = require('fs'); 
 const moment = require("moment");
 const {Builder, By, Key, until} = require('selenium-webdriver'); 
 
@@ -62,8 +63,6 @@ const getIntoBdP = async () => {
                                         let rowList = await driver.wait(until.elementLocated(By.id("table_1")),5000).findElements(By.css("tr")).then(async (rowList) =>{
                                             for(var i=1 ; i< rowList.length; i++){
                                                 await rowList[i].findElements(By.css("td")).then(async (colValue) => {
-                                                    
-                                                    //for(var j=0; j<colValue.length ; j++){
                                                         colValue[0].getText().then((coltxt) => {
                                                             colValue[4].getText().then((coltxt2) => {
                                                                 const newData = {
@@ -73,15 +72,15 @@ const getIntoBdP = async () => {
                                                                 data = [... data, newData] //o notes.concat(newNote)
                                                                 console.log(newData)
                                                             })
-                                                                
                                                         })
-                                                    //}
-                                                    
-                                                })
-                                                
-                                                
+                                                })  
                                             }
                                         })
+                                        fs.writeFile('data.json', JSON.stringify(data),'utf8', (err) => { 
+                                            if (err) throw err; 
+                                            console.log('The file has been saved!'); 
+                                          }); 
+                                        
                                     })
                                     
                                 })
