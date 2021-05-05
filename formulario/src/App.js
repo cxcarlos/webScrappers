@@ -53,15 +53,16 @@ function App() {
 
   return (
     <Fragment>
-      <TodoList todos={todos} toggleTodo={toggleTodo}/>
-      <br></br>
+      <br/>
       Referencia: <input ref={todoTaskRef} type='text' placeholder="# Referencia"/>
-      <br></br>
+      <br/>
          Lote: <input ref={todoLoteRef} type='text' placeholder="# Lote"/>
-      <br></br>
+      <br/>
       <button type='submit' onClick={handleTodoAdd} >Agregar</button>
       <button type='submit'onClick={handlerClearAll}>Eliminar</button>
-     
+      <br/><br/><br/>
+      <TodoList todos={todos} toggleTodo={toggleTodo}/>
+      
     </Fragment>
   );
 }
