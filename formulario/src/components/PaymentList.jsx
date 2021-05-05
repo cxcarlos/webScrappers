@@ -35,7 +35,7 @@ export default function PaymentList({payments, togglePayment}) {
                 </TableHead>
                 <TableBody>
                         {payments.map(payment => (
-                            <PaymentItem key={payment.id} payment={payment} togglePayment={togglePayment}/>
+                            <PaymentItem key={payment.reference} payment={payment} togglePayment={togglePayment}/>
                         ))}
                 </TableBody>
             </Table>
