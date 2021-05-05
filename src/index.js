@@ -27,8 +27,13 @@ const getIntoBdP = async () => {
                 await driver.findElement(By.name("_eventId_aceptar")).click().then(async () => {
                     await driver.findElement(By.id("centrecontent")).then(async () => {
                         await driver.wait(until.elementLocated(By.className("jmesa")),2000).then(async () => {
-                            await driver.wait(until.elementLocated(By.id("table_1_row1")),2000).click().then(async ()=>{
-                                await driver.wait(until.elementLocated(By.id("solapa_movimientos")),2000).click();
+                            await driver.wait(until.elementLocated(By.id("table_1_row1")),2000).click().then(async () => {
+                                await driver.wait(until.elementLocated(By.id("solapa_movimientos")),5000).click().then(async () => {
+                                    let fechaDesde = await driver.wait(until.elementLocated(By.id("fechaDesde")));
+                                    let fechaHasta = await driver.wait(until.elementLocated(By.id("fechaHasta")));
+                                    driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaDesde);
+                                    driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaHasta);
+                                })
                             })
                         })
                     })
