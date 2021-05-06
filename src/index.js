@@ -53,12 +53,12 @@ const getIntoBdP = async (date, response) => {
     })
 };
 
-const recolectData = async (rowList) => {     
+const recolectData = async (rowList) => {      console.log("Funcion Mapeo")
     let data = [];                                        
-    for(var i=1 ; i < rowList.length; i++){                            
+    for(var i=1 ; i < rowList.length; i++){ console.log("Recorrer Filas")
         await rowList[i].findElements(By.css("td")).then(async (colValue) => {
             await colValue[0].getText().then(async (coltxt) => {
-                await colValue[4].getText().then( async (coltxt2) => {
+                await colValue[4].getText().then( async (coltxt2) => { console.log("Anadir campos numero y fecha a objeto DATA")
                     const newData = {
                         fecha: coltxt,
                         numero: coltxt2
@@ -69,6 +69,7 @@ const recolectData = async (rowList) => {
             })
         })                                                          
     }  
+    console.log("Retornar Data")
     return data;
 }   
 
@@ -82,21 +83,35 @@ const getData = async (date, response) => {
             driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaHasta);
             driver.executeScript(`arguments[0].value='${minDate(date)}';`, fechaDesde);
             driver.executeScript(`arguments[0].value='${maxDate(date)}';`, fechaHasta);
-            
-            await driver.wait(until.elementLocated(By.id("movimientosForm")),5000).click().then(async () => { 
-                await driver.wait(until.elementLocated(By.name("_eventId_consultar")),50000).click().then(async () => { 
-                    await driver.wait(until.elementLocated(By.className("jmesa")),2000).then(async () => {
+            console.log("Fechas Editadas")
+            urlPrev = (await driver).getCurrentUrl();
+            await driver.wait(until.elementLocated(By.id("movimientosForm")),5000).click().then(async () => { console.log("FORM Detalle")
+                
+                let buttonConsultar = await driver.wait(until.elementLocated(By.id("ConsultarButtonId")), 5000);
+                await driver.executeScript("arguments[0].click();", buttonConsultar)
+                
+                do{
+                    console.log("Url igual")
+                    urlNext = (await driver).getCurrentUrl().toString();
+                }while(urlPrev === urlNext)
+                console.log("Url nueva")
+                    await driver.wait(until.elementLocated(By.className("jmesa")),2000).then(async () => { console.log("Elemento JMESA encontrado")
                         await driver.wait(until.elementLocated(By.id("table_1")),1000).findElements(By.css("tr")).then(async (rowList) =>{
-                            
-                            await recolectData(rowList).then((data) => {
-                                response.status(202).json(data); 
-                            });
+                            console.log("Table Encontrado")
+                            try{
+                                await recolectData(rowList).then((data) => {
+                                    console.log("Enviar response JSON")
+                                    response.status(202).json(data); 
+                                });
+                            }catch(error ){
+                                console.log("error: " + error);
+                            }
                         })
                     })
                 })   
             }) 
-        })
-
+        
+        
     }catch(error ){
         console.log("error: " + error);
     }
