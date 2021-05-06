@@ -11,7 +11,9 @@
   "author": "Carlos Carvajal and Erick Garcia",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "moment": "^2.29.1",
     "selenium-webdriver": "*"
   }

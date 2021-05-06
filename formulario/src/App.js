@@ -3,6 +3,7 @@ import React, {Fragment, useState, useRef, useEffect} from "react";
 import PaymentList from "./components/PaymentList";
 //import logo from './logo.svg';
 import './App.css';
+import fetch from 'node-fetch';
 
 const KEY = 'payApp.payments';
 
@@ -35,14 +36,22 @@ function App() {
     setPayments(newpayments); // lo volvoemos a enviar con el estado cambiado
   }
 
+  const getExternData = (date) => {
+    fetch('http://127.0.0.1:3000/api/data/'+date)
+    .then(response => response.json())
+    .then(json => console.log(json))
+  }
+
   const handlePaymentAdd = () => {
+    
     const reference = paymentRef.current.value;
     const lote = paymentLoteRef.current.value;
     if(reference ==="" && lote === "")return;
+    getExternData(paymentDateRef.current.value);
+
     setPayments((prevpayments) => {
       return [...prevpayments, {date: paymentDateRef.current.value, reference, lote}]
     })
-
     paymentRef.current.value = null ;
     paymentLoteRef.current.value = null ;
   }
