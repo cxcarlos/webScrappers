@@ -1,18 +1,15 @@
 require('dotenv').config(); 
-//const { rejects } = require('assert');
+
 const fs = require('fs'); 
 const moment = require("moment");
 const {Builder, By, Key, until} = require('selenium-webdriver'); 
-const { get } = require('selenium-webdriver/http');
-
 const express = require("express");
+
 const app = express();
 var cors = require('cors');
 
 app.use(express.json());
 app.use(cors());
-
-//let data = [];
 
 const GetDateFormat = (date) => { 
     var month = (date.getMonth() + 1).toString();
@@ -34,8 +31,6 @@ const maxDate = (date) => {
     return newDate;
 }
 
-var dateObj = new Date(); 
-var dateFormat = GetDateFormat(dateObj); // 07/05/2016 
 let driver = new Builder().forBrowser('chrome').build(); 
 
 const getIntoBdP = async (date, response) => {
@@ -58,102 +53,71 @@ const getIntoBdP = async (date, response) => {
     })
 };
 
-const getData = async (date, response) => {
-    
-    await driver.findElement(By.id("centrecontent")).then(async () => {
-        let fechaDesde = await driver.wait(until.elementLocated(By.id("fechaDesde")));
-        let fechaHasta = await driver.wait(until.elementLocated(By.id("fechaHasta")));
-        driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaDesde);
-        driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaHasta);
-        driver.executeScript(`arguments[0].value='${minDate(date)}';`, fechaDesde);
-        driver.executeScript(`arguments[0].value='${maxDate(date)}';`, fechaHasta);
-        
-        await driver.wait(until.elementLocated(By.name("_eventId_consultar"))).click().then(async () => { 
-            console.log("ENTRAR")
-     //       try {
-                await driver.wait(until.elementLocated(By.id("table_1"))).findElements(By.css("tr")).then(async (rowList) =>{
-                    console.log("table1");
-                    let data = [];
-                    const recolectData = async (rowList, data) => {                                             
-                        for(var i=1 ; i < rowList.length; i++){
-                            //console.log(rowList.getText());
-                            await rowList[i].findElements(By.css("td")).then(async (colValue) => {
-                                await colValue[0].getText().then(async (coltxt) => {
-                                    await colValue[4].getText().then( async (coltxt2) => {
-                                        const newData = {
-                                            fecha: coltxt,
-                                            numero: coltxt2
-                                        }
-                                        
-                                        data.push(newData);
-                                    })
-                                })
-                            })                                                          
-                        }  
+const recolectData = async (rowList) => {     
+    let data = [];                                        
+    for(var i=1 ; i < rowList.length; i++){                            
+        await rowList[i].findElements(By.css("td")).then(async (colValue) => {
+            await colValue[0].getText().then(async (coltxt) => {
+                await colValue[4].getText().then( async (coltxt2) => {
+                    const newData = {
+                        fecha: coltxt,
+                        numero: coltxt2
                     }
+                    data = [...data, newData];
 
-                    const jsonData = async(rowList,data) => {
-                        await recolectData(rowList, data);
-                        fs.writeFile('data.json', JSON.stringify(data),'utf8', (err) => { 
-                            if (err) throw err; 
-                            console.log('The file has been saved!'); 
-                        });
-                        response.status(202).json(data); 
-                        
-                    }
-                    jsonData(rowList,data);      
                 })
-       /*     }
-            catch(error)
-            {
-                await driver.wait(until.elementLocated(By.id("table_1")),1000).findElements(By.css("tr")).then(async (rowList) =>{
-                    console.log("table1");
-                    let data = [];
-                    const recolectData = async (rowList, data) => {                                             
-                        for(var i=1 ; i < rowList.length; i++){
-                            await rowList[i].findElements(By.css("td")).then(async (colValue) => {
-                                await colValue[0].getText().then(async (coltxt) => {
-                                    await colValue[4].getText().then( async (coltxt2) => {
-                                        const newData = {
-                                            fecha: coltxt,
-                                            numero: coltxt2
-                                        }
-                                        
-                                        data.push(newData);
-                                    })
-                                })
-                            })                                                          
-                        } 
-                    }
-                    await recolectData(rowList, data);
-                    
-                    const jsonData = async(rowList,data) => {
-                        await recolectData(rowList, data);
-                        fs.writeFile('data.json', JSON.stringify(data),'utf8', (err) => { 
-                            if (err) throw err; 
-                            console.log('The file has been saved!'); 
-                        });
-                        response.status(202).json(data); 
-                    }
-                    jsonData(rowList,data);      
-                })
-            }
-          */  
+            })
+        })                                                          
+    }  
+    return data;
+}   
+
+const getData = async (date, response) => {
+    try{
+        await driver.findElement(By.id("centrecontent")).then(async () => { 
+                
+            let fechaDesde = await driver.wait(until.elementLocated(By.id("fechaDesde")));
+            let fechaHasta = await driver.wait(until.elementLocated(By.id("fechaHasta")));
+            driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaDesde);
+            driver.executeScript("arguments[0].removeAttribute('readonly') ",fechaHasta);
+            driver.executeScript(`arguments[0].value='${minDate(date)}';`, fechaDesde);
+            driver.executeScript(`arguments[0].value='${maxDate(date)}';`, fechaHasta);
+            
+            await driver.wait(until.elementLocated(By.id("movimientosForm")),5000).click().then(async () => { 
+                await driver.wait(until.elementLocated(By.name("_eventId_consultar")),50000).click().then(async () => { 
+                    await driver.wait(until.elementLocated(By.className("jmesa")),2000).then(async () => {
+                        await driver.wait(until.elementLocated(By.id("table_1")),1000).findElements(By.css("tr")).then(async (rowList) =>{
+                            
+                            await recolectData(rowList).then((data) => {
+                                response.status(202).json(data); 
+                            });
+                        })
+                    })
+                })   
+            }) 
         })
-    })
+
+    }catch(error ){
+        console.log("error: " + error);
+    }
 }
 
+
+
 const main = async () => {
-    await getIntoBdP()
+    await getIntoBdP();
+
     app.get('/api/data/:date', async (request,response) => {
         const date = (request.params.date).toString();
         await getData(date, response);
     });
+
 }
 
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`); //Como puede existir una pequenia latencia se establece n callback que se ejecute cuando termine el servidor de levantarce
+  console.log(`Server running on port ${PORT}`); 
 });
+
 
 main();
